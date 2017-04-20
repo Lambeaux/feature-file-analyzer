@@ -23,6 +23,6 @@ class MainView : View() {
             }
         }
         left(FeatureFileView::class)
-        center(FeatureTableView::class)
+        center(FeaturesView::class)
     }
 }

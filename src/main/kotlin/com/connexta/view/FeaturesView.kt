@@ -8,7 +8,7 @@ import tornadofx.cellFormat
 import tornadofx.singleAssign
 import tornadofx.treeview
 
-class FeatureTableView : View() {
+class FeaturesView : View() {
     var rootNode: TreeItem<*> by singleAssign<TreeItem<*>>()
 
     override val root = treeview<Any> {

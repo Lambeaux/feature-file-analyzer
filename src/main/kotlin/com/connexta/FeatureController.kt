@@ -4,7 +4,7 @@ import com.connexta.model.Bundle
 import com.connexta.model.Feature
 import com.connexta.model.FeatureFile
 import com.connexta.view.FeatureFileView
-import com.connexta.view.FeatureTableView
+import com.connexta.view.FeaturesView
 import org.w3c.dom.Element
 import tornadofx.*
 import java.io.File
@@ -15,7 +15,7 @@ class FeatureController : Controller() {
 
     // Views
     val featureFileView: FeatureFileView by inject()
-    val featureTableView: FeatureTableView by inject()
+    val featuresView: FeaturesView by inject()
 
     // Models
     val featureFiles = mutableListOf<FeatureFile>().observable()
@@ -28,43 +28,42 @@ class FeatureController : Controller() {
     fun loadFeatures(root: File) {
         featureFiles.clear()
 
-        val regex = Regex("(\\w+-)+app")
+        val namePattern = Regex("(\\w+-)+app")
         val exclude = Regex("\\.\\w*|target|node|node_modules|java|webapp|schemas|test")
 
         val files = root.walkTopDown()
                 .onEnter { !it.name.matches(exclude) }
                 .filter { it.name == "features.xml" }
-                .filter { regex.containsMatchIn(it.canonicalPath) }
+                .filter { namePattern.containsMatchIn(it.canonicalPath) }
 
         val appNames = files.map(File::getCanonicalPath)
-                .map { regex.find(it) }
+                .map { namePattern.find(it) }
                 .filterNotNull()
                 .map { it.value }
                 .toList()
+
         files.mapIndexedTo(featureFiles, {
             i, file ->
-            FeatureFile(appNames[i], parseFeature(file))
+            FeatureFile(appNames[i], parseFeatureFile(file))
         })
 
         linkFeatures()
     }
 
-    private fun parseFeature(file: File): MutableList<Feature> {
-        val features = ArrayList<Feature>()
-
+    private fun parseFeatureFile(file: File): MutableList<Feature> {
         val document = documentBuilder.parse(file)
-
         val rootFeature = document.getElementsByTagName("features").item(0)
 
+        val features = ArrayList<Feature>()
         (0 until rootFeature.childNodes.length)
                 .map { rootFeature.childNodes.item(it) }
                 .filterIsInstance<Element>()
                 .filter { it.tagName == "feature" }
                 .mapTo(features) {
                     Feature(
-                            it.getAttribute("name"),
-                            it.getAttribute("install"),
-                            it.getAttribute("version"),
+                            it.getAttribute("name").trim(),
+                            it.getAttribute("install").trim(),
+                            it.getAttribute("version").trim(),
                             getTempFeatures(it),
                             getBundlesFromFeature(it))
                 }
@@ -81,7 +80,7 @@ class FeatureController : Controller() {
                 .map {
                     Feature(
                             name = it.textContent.trim(),
-                            install = "TEMP",
+                            install = it.getAttribute("install").trim(),
                             version = it.getAttribute("version").trim())
                 }.toMutableList()
 
@@ -103,9 +102,9 @@ class FeatureController : Controller() {
     }
 
     private fun selectedFeatureFile() {
-        featureTableView.root.populate {
+        featuresView.root.populate {
             parent ->
-            if (parent == featureTableView.rootNode) {
+            if (parent == featuresView.rootNode) {
                 featureFileView.listView.selectedItem?.features
             } else if (parent.value is Feature) {
                 (parent.value as Feature).features + (parent.value as Feature).bundles
