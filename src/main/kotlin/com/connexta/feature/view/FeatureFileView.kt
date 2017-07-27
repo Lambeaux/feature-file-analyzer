@@ -1,6 +1,6 @@
-package com.connexta.view
+package com.connexta.feature.view
 
-import com.connexta.model.FeatureFile
+import com.connexta.feature.model.FeatureFile
 import javafx.scene.control.ListView
 import javafx.scene.layout.Priority
 import tornadofx.*

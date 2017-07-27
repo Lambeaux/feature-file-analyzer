@@ -1,7 +1,7 @@
-package com.connexta.view
+package com.connexta.feature.view
 
-import com.connexta.model.Bundle
-import com.connexta.model.Feature
+import com.connexta.feature.model.Bundle
+import com.connexta.feature.model.Feature
 import javafx.scene.control.TreeItem
 import tornadofx.View
 import tornadofx.cellFormat

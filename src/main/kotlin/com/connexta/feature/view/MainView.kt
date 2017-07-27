@@ -1,6 +1,6 @@
-package com.connexta.view
+package com.connexta.feature.view
 
-import com.connexta.FeatureController
+import com.connexta.feature.FeatureController
 import tornadofx.*
 import java.io.File
 

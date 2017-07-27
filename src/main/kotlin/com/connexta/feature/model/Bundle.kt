@@ -1,4 +1,4 @@
-package com.connexta.model
+package com.connexta.feature.model
 
 data class Bundle(
         val artifactId: String,
